@@ -4,7 +4,8 @@ A KakaoTalk-style AI chat app — talk to your own custom AI idol, girlfriend, o
 
 Comes with 4 built-in characters (2 female, 2 male) and a dead-simple system for adding your own.
 <img width="1642" height="867" alt="image" src="https://github.com/user-attachments/assets/6b92e39e-475b-4b5c-bd4a-17a60ceef2e6" />
-<img width="719" height="738" alt="image" src="https://github.com/user-attachments/assets/9a5d937f-5431-4108-82a5-2625af72988f" />
+<img width="712" height="742" alt="image" src="https://github.com/user-attachments/assets/ed00dc1a-7222-445d-8123-aa5ae78fddb0" />
+
 
 ---
 
