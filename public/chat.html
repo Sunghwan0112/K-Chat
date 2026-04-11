@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <title>Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="chat-header" id="chatHeader">
+    <button class="back-btn" id="backBtn" title="Back to selection">‹</button>
+    <div class="header-profile">
+      <div class="header-avatar" id="headerAvatar">
+        <!-- filled by app.js -->
+      </div>
+      <div class="header-info">
+        <div class="header-name" id="headerName">...</div>
+        <div class="header-status" id="headerStatus">...</div>
+      </div>
+    </div>
+    <div id="chatLangMount"></div>
+    <button class="menu-btn" id="resetBtn" title="Reset conversation">↺</button>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-area" id="chatArea"></div>
+
+  <!-- Typing indicator (hidden by default) -->
+  <div class="typing-indicator" id="typingIndicator" style="display:none">
+    <div class="avatar small" id="typingAvatar"><!-- filled by app.js --></div>
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Emoji picker -->
+  <div class="emoji-picker" id="emojiPicker" style="display:none">
+    <div class="emoji-grid"></div>
+  </div>
+
+  <!-- Input area -->
+  <div class="input-area">
+    <button class="input-btn emoji-btn" id="emojiBtn">＋</button>
+    <div class="input-wrap">
+      <textarea
+        id="messageInput"
+        placeholder="Send a message"
+        rows="1"
+        maxlength="500"
+      ></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

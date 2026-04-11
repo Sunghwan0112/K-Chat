@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>K Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="select-page">
+
+  <div class="select-hero">
+    <div class="select-hero-inner">
+      <div class="select-logo">✦ K CHAT</div>
+      <p class="select-subtitle" id="heroSubtitle"></p>
+      <div id="langSelectorMount"></div>
+    </div>
+  </div>
+
+  <div class="select-filter-bar">
+    <button class="filter-btn active" data-gender="all" id="filterAll"></button>
+    <button class="filter-btn" data-gender="female" id="filterFemale"></button>
+    <button class="filter-btn" data-gender="male" id="filterMale"></button>
+  </div>
+
+  <div class="select-grid" id="characterGrid">
+    <!-- Cards injected by select.js -->
+  </div>
+
+  <div class="select-loading" id="loadingState"></div>
+  <div class="select-error" id="errorState" style="display:none"></div>
+
+  <script src="i18n.js"></script>
+  <script src="select.js"></script>
+</body>
+</html>
