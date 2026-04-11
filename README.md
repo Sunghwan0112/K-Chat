@@ -12,10 +12,12 @@ Comes with 4 built-in characters (2 female, 2 male) and a dead-simple system for
 - **Streaming chat** — responses stream in real time with typewriter effect
 - **Multi-bubble replies** — responses split into separate chat bubbles (separated by `|`), with realistic delays between them
 - **Persistent history** — conversation saved per-character, survives page refresh
+- **Rolling memory** — every 10 messages, older conversation is summarized by Claude Haiku and injected into the system prompt so the character remembers things long-term; summaries are stored per language and automatically recompressed if they get too long
 - **Proactive first contact** — characters reach out first when you open the app after being away
 - **Time-aware** — each message injects the current time so characters respond naturally to morning / night / weekday context
-- **Multi-language** — UI and character responses available in English, 한국어, 日本語, Español, 中文
-- **Prompt cache** — uses Claude's prompt caching to reduce cost on long conversations
+- **Multi-language** — UI and character responses available in English, 한국어, 日本語, Español, 中文; language can be switched from both the selection screen and the chat header
+- **Live translation** — switching language mid-conversation translates the entire chat history into the new language using Claude Haiku
+- **Prompt cache** — uses Claude's prompt caching to reduce token cost on long conversations
 - **Gradient avatars** — beautiful fallback when no photo is provided; plug in a `.jpg` to use real images
 
 ---
@@ -61,11 +63,12 @@ The app supports **5 languages**: English, 한국어, 日本語, Español, 中�
 
 ### How to change the language
 
-1. Open `http://localhost:3000` (character selection screen)
-2. Click the **🌐 language dropdown** in the center of the hero section
-3. Select your language
+You can switch language from two places:
 
-The setting is saved automatically — you don't need to change it again.
+- **Selection screen** (`http://localhost:3000`) — 🌐 dropdown in the hero section
+- **Chat screen** — 🌐 dropdown in the top-right of the chat header
+
+The setting is saved automatically to `localStorage`.
 
 ### What changes when you switch language
 
@@ -73,10 +76,12 @@ The setting is saved automatically — you don't need to change it again.
 |-|---------|
 | UI text | Buttons, labels, placeholders, dividers |
 | Character responses | The AI replies in the selected language |
+| Chat history | Existing messages are translated into the new language via Claude Haiku |
+| Memory summary | Summaries are stored per language and generated in the active language |
 | Trigger messages | First greeting, inactivity check-in, reset greeting |
 | Error messages | Network errors, server errors shown in chat |
 
-Everything is in the same language — if you pick Korean, the character texts you in Korean from the very first message.
+Everything is in the same language — if you pick Korean, the character texts you in Korean from the very first message. If you switch mid-conversation, the whole history is translated on the fly.
 
 ### How it works
 
@@ -389,7 +394,7 @@ If the image file is missing or fails to load, the app automatically falls back 
 │   ├── style.css                All styles
 │   └── [id].jpg / [id].png      Character photos (optional, gitignored)
 └── data/
-    └── history_[id].json        Conversation history per character (gitignored)
+    └── history_[id].json        Conversation history + per-language memory summary (gitignored)
 ```
 
 ---
@@ -402,10 +407,15 @@ Each character is a JSON file with a `systemPrompt` field. The server reads all 
 
 When a message is sent, the server:
 1. Appends a language instruction to the system prompt based on the user's selected language
-2. Injects `[Current time (EST)]` at the top of the latest user message
-3. Trims history to the last 20 messages (keeps user/assistant pairs balanced)
-4. Applies [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) to reduce token cost
-5. Streams the response back as Server-Sent Events
+2. Loads the per-language relationship memory summary (if any) and appends it to the system prompt
+3. Injects `[Current time (EST)]` at the top of the latest user message
+4. Trims history to the last 20 messages (keeps user/assistant pairs balanced)
+5. Applies [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) to reduce token cost
+6. Streams the response back as Server-Sent Events
+
+### Memory system
+
+Every 10 messages, the full `uiHistory` is summarized by Claude Haiku into a 3–5 sentence relationship memory and stored in `data/history_[id].json`. Summaries are keyed by language (`{ en: "...", ko: "..." }`). If a summary exceeds 500 characters it is recompressed automatically. On each chat request, the current language's summary is injected into the system prompt under `## Relationship Memory` so the character can recall details from much earlier in the conversation.
 
 ### Message format
 
