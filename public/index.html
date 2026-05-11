@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>K Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="select-page">
+
+  <div class="select-hero">
+    <div class="select-hero-inner">
+      <div class="select-logo">✦ K CHAT</div>
+      <p class="select-subtitle" id="heroSubtitle"></p>
+      <div id="langSelectorMount"></div>
+      <div class="runtime-settings-wrap">
+        <button class="runtime-settings-btn" id="runtimeSettingsBtn" type="button">AI Setup</button>
+      </div>
+      <div class="edit-mode-wrap">
+        <button class="edit-mode-btn" id="editModeToggle" type="button">Edit Mode OFF</button>
+      </div>
+      <div class="bg-switch-wrap">
+        <span class="bg-switch-label" id="bgModeLabel">Background</span>
+        <div class="bg-switch">
+          <button class="bg-switch-btn active" id="bgModeNormal" data-bg-mode="normal">Normal</button>
+          <button class="bg-switch-btn" id="bgModeLight" data-bg-mode="light">Light</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="select-filter-section">
+    <div class="select-filter-bar">
+      <button class="filter-btn active" data-category="all" id="filterAll"></button>
+      <button class="filter-btn" data-category="idol" id="filterIdol"></button>
+      <button class="filter-btn" data-category="friend" id="filterFriend"></button>
+    </div>
+    <div class="select-filter-bar select-filter-bar--sub">
+      <button class="filter-btn filter-btn--sub active" data-gender="all" id="filterGenderAll"></button>
+      <button class="filter-btn filter-btn--sub" data-gender="female" id="filterFemale"></button>
+      <button class="filter-btn filter-btn--sub" data-gender="male" id="filterMale"></button>
+    </div>
+  </div>
+
+  <div class="select-grid" id="characterGrid">
+    <!-- Cards injected by select.js -->
+  </div>
+
+  <div class="select-loading" id="loadingState"></div>
+  <div class="select-error" id="errorState" style="display:none"></div>
+
+  <div class="app-toast" id="appToast" role="status" aria-live="polite"></div>
+
+  <!-- Delete character: in-page only (no native confirm/prompt — breaks IME on Windows/Electron) -->
+  <div class="delete-char-modal" id="deleteCharModal" aria-hidden="true">
+    <div class="reset-confirm-inner delete-char-modal-box">
+      <div class="delete-char-intro" id="deleteCharIntro"></div>
+      <input type="text" id="deleteCharNameInput" class="delete-char-name-input" autocomplete="off" spellcheck="false" />
+      <div class="reset-confirm-actions">
+        <button type="button" class="profile-btn profile-btn--ghost" id="deleteCharCancel"></button>
+        <button type="button" class="profile-btn profile-btn--primary delete-char-confirm-btn" id="deleteCharConfirm"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="runtime-config-modal" id="runtimeConfigModal" aria-hidden="true">
+    <div class="runtime-config-modal-inner">
+      <div class="runtime-config-header">
+        <h3 id="runtimeConfigTitle">AI Setup</h3>
+        <button type="button" class="runtime-config-close" id="runtimeConfigClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="runtime-config-body">
+        <p class="runtime-config-help" id="runtimeConfigHelp">
+          Set your provider and API key once. You can update this anytime.
+        </p>
+        <label>
+          Provider
+          <select id="configAiProvider">
+            <option value="hf">HuggingFace</option>
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+          </select>
+        </label>
+        <label>
+          Model preset
+          <select id="configModelPreset">
+            <option value="low">low</option>
+            <option value="mid">mid</option>
+            <option value="high">high</option>
+          </select>
+        </label>
+        <label id="configHfWrap">
+          HF token
+          <input type="password" id="configHfToken" placeholder="hf_xxx..." />
+        </label>
+        <label id="configOpenAiWrap">
+          OpenAI API key
+          <input type="password" id="configOpenAiKey" placeholder="sk-..." />
+        </label>
+        <label id="configAnthropicWrap">
+          Anthropic API key
+          <input type="password" id="configAnthropicKey" placeholder="sk-ant-..." />
+        </label>
+        <button type="button" class="runtime-advanced-toggle" id="runtimeAdvancedToggle">Advanced</button>
+        <div class="runtime-advanced-fields" id="runtimeAdvancedFields" aria-hidden="true">
+          <label>
+            <span id="runtimeHostLabel">Host</span>
+            <input type="text" id="configHost" placeholder="localhost" />
+          </label>
+          <label>
+            <span id="runtimePortLabel">Port</span>
+            <input type="number" id="configPort" min="1" max="65535" placeholder="3000" />
+          </label>
+        </div>
+        <p class="runtime-config-note" id="runtimeConfigNote"></p>
+      </div>
+      <div class="runtime-config-footer">
+        <button type="button" class="runtime-config-btn runtime-config-btn--ghost" id="runtimeConfigCancel">Cancel</button>
+        <button type="button" class="runtime-config-btn runtime-config-btn--primary" id="runtimeConfigSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="character-edit-modal" id="characterEditModal" aria-hidden="true">
+    <div class="character-edit-modal-inner">
+      <div class="character-edit-header">
+        <h3 id="characterEditTitle">Edit Character</h3>
+        <button type="button" class="character-edit-close" id="characterEditClose" aria-label="Close">&times;</button>
+      </div>
+      <div class="character-edit-body">
+        <label>
+          Name
+          <input type="text" id="editName" maxlength="40" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Korean Name
+          <input type="text" id="editKoreanName" maxlength="40" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Tagline
+          <input type="text" id="editTagline" maxlength="140" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Role
+          <input type="text" id="editRole" maxlength="80" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Group
+          <input type="text" id="editGroup" maxlength="80" autocomplete="off" spellcheck="false" />
+        </label>
+        <label>
+          Age
+          <input type="number" id="editAge" min="0" max="120" />
+        </label>
+        <label>
+          Category
+          <select id="editCategory">
+            <option value="idol">idol</option>
+            <option value="friend">friend</option>
+          </select>
+        </label>
+        <label>
+          Gender
+          <select id="editGender">
+            <option value="female">female</option>
+            <option value="male">male</option>
+          </select>
+        </label>
+        <label>
+          Color
+          <div class="color-input-row">
+            <input type="color" id="editColorPicker" />
+            <input type="text" id="editColor" placeholder="#6366f1" maxlength="7" />
+          </div>
+        </label>
+        <label class="character-edit-field--full">
+          Prompt
+          <textarea id="editSystemPrompt" rows="10" spellcheck="false" autocomplete="off"></textarea>
+        </label>
+        <div class="character-edit-field--full character-edit-avatar-upload">
+          <span class="character-edit-file-section-label" id="editAvatarFieldLabel"></span>
+          <div class="character-edit-file-row">
+            <label for="editAvatarFile" class="character-edit-file-btn" id="editAvatarPickBtn"></label>
+            <input type="file" id="editAvatarFile" class="character-edit-file-input-native" accept="image/png,image/jpeg" />
+            <span class="character-edit-file-status" id="editAvatarFileStatus"></span>
+          </div>
+        </div>
+        <div class="character-edit-preview-wrap character-edit-field--full">
+          <img id="editAvatarPreview" alt="Avatar preview" />
+        </div>
+      </div>
+      <div class="character-edit-footer">
+        <button type="button" class="character-edit-btn character-edit-btn--danger" id="characterEditDelete">Delete</button>
+        <button type="button" class="character-edit-btn character-edit-btn--ghost" id="characterEditCancel">Cancel</button>
+        <button type="button" class="character-edit-btn character-edit-btn--primary" id="characterEditSave">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="select.js"></script>
+</body>
+</html>

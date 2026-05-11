@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+  <title>Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="chat-header" id="chatHeader">
+    <button class="back-btn" id="backBtn" title="Back to selection">‹</button>
+    <div class="header-profile">
+      <div class="header-avatar" id="headerAvatar">
+        <!-- filled by app.js -->
+      </div>
+      <div class="header-info">
+        <div class="header-name" id="headerName">...</div>
+        <div class="header-status" id="headerStatus">...</div>
+      </div>
+    </div>
+    <div id="chatLangMount"></div>
+    <button class="menu-btn" id="profileBtn" title="Profile settings">⚙</button>
+    <button class="menu-btn" id="resetBtn" title="Reset conversation">↺</button>
+  </div>
+
+  <!-- Chat area -->
+  <div class="chat-area" id="chatArea"></div>
+
+  <!-- Typing indicator (hidden by default) -->
+  <div class="typing-indicator" id="typingIndicator" style="display:none">
+    <div class="avatar small" id="typingAvatar"><!-- filled by app.js --></div>
+    <div class="typing-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <!-- Emoji picker -->
+  <div class="emoji-picker" id="emojiPicker" style="display:none">
+    <div class="emoji-grid"></div>
+  </div>
+
+  <!-- Avatar modal (click avatar to enlarge) -->
+  <div class="avatar-modal" id="avatarModal" aria-hidden="true">
+    <div class="avatar-modal-inner">
+      <button class="avatar-modal-close" id="avatarModalClose" aria-label="Close">×</button>
+      <img class="avatar-modal-img" id="avatarModalImg" alt="" />
+    </div>
+  </div>
+
+  <!-- User profile modal -->
+  <div class="profile-modal" id="profileModal" aria-hidden="true">
+    <div class="profile-modal-inner">
+      <div class="profile-modal-header">
+        <h3 id="profileTitle">User Profile</h3>
+        <button class="profile-modal-close" id="profileModalClose" aria-label="Close">×</button>
+      </div>
+      <div class="profile-modal-body">
+        <label id="labelProfileNameKo">한국 이름
+          <input id="profileNameKo" type="text" placeholder="예: 홍길동" />
+        </label>
+        <label id="labelProfileNameEn">영어 이름
+          <input id="profileNameEn" type="text" placeholder="e.g. Steve Hong" />
+        </label>
+        
+        <label id="labelProfileJob">직업
+          <input id="profileJob" type="text" placeholder="Programmer" />
+        </label>
+        <label id="labelProfileEducation">학력
+          <input id="profileEducation" type="text" placeholder="CMU graduate" />
+        </label>
+        <label id="labelProfileResidence">현재 상태/거주
+          <input id="profileResidence" type="text" placeholder="Studying abroad in the US" />
+        </label>
+        <label id="labelProfileNationality">국적
+          <input id="profileNationality" type="text" placeholder="Korean" />
+        </label>
+        <label id="labelProfileUserTimeMode">유저 시간대 모드
+          <select id="profileUserTimeMode">
+            <option value="auto" id="optUserTimeAuto">자동 (브라우저)</option>
+            <option value="manual" id="optUserTimeManual">수동 선택</option>
+          </select>
+        </label>
+        <label id="labelProfileUserTimeZone">유저 시간대 (수동일 때)
+          <select id="profileUserTimeZone">
+            <option value="Asia/Seoul">Asia/Seoul</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+          </select>
+        </label>
+        <label id="labelProfileWeekend">주말 루틴
+          <input id="profileWeekend" type="text" placeholder="Go to church" />
+        </label>
+        <label id="labelProfileInterests">관심사 (쉼표로 구분)
+          <input id="profileInterests" type="text" placeholder="music, singing, guitar" />
+        </label>
+
+        <hr />
+        <label id="labelProfileGender">기본 성별
+          <select id="profileGender">
+            <option value="male">male</option>
+            <option value="female">female</option>
+            <option value="nonbinary">nonbinary</option>
+            <option value="unspecified">unspecified</option>
+          </select>
+        </label>
+
+        <hr />
+        <label id="labelProfileGenderPerChar">이 캐릭터 전용 성별
+          <select id="profileGenderPerChar">
+            <option value="" id="optProfileUseDefault">(기본값 사용)</option>
+            <option value="male">male</option>
+            <option value="female">female</option>
+            <option value="nonbinary">nonbinary</option>
+            <option value="unspecified">unspecified</option>
+          </select>
+        </label>
+        <label id="labelProfileNotesPerChar">이 캐릭터 전용 메모
+          <input id="profileNotesPerChar" type="text" placeholder="호칭/관계 분위기 메모" />
+        </label>
+        <label id="labelProfileCharacterTimeZone">이 캐릭터 시간대
+          <select id="profileCharacterTimeZone">
+            <option value="Asia/Seoul">Asia/Seoul</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="America/Los_Angeles">America/Los_Angeles</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+          </select>
+        </label>
+      </div>
+      <div class="profile-modal-footer">
+        <button class="profile-btn profile-btn--ghost" id="profileCancelBtn">취소</button>
+        <button class="profile-btn profile-btn--primary" id="profileSaveBtn">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset confirm (in-page — native confirm() breaks IME on Windows/Electron) -->
+  <div class="reset-confirm-modal" id="resetConfirmModal" aria-hidden="true">
+    <div class="reset-confirm-inner">
+      <p class="reset-confirm-msg" id="resetConfirmMessage"></p>
+      <div class="reset-confirm-actions">
+        <button type="button" class="profile-btn profile-btn--ghost" id="resetConfirmCancel"></button>
+        <button type="button" class="profile-btn profile-btn--primary" id="resetConfirmOk"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input area -->
+  <div class="input-area">
+    <button class="input-btn emoji-btn" id="emojiBtn">＋</button>
+    <div class="input-wrap">
+      <textarea
+        id="messageInput"
+        placeholder="Send a message"
+        rows="1"
+        maxlength="500"
+        spellcheck="false"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+      ></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

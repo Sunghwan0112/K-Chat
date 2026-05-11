@@ -1,0 +1,15 @@
+node_modules/
+data/history_*.json
+*.webp
+.env
+.mailmap
+data/user_profile.json
+
+# Desktop packaging outputs
+dist/
+build/icons/linux/
+
+# Desktop packaging code (local-only)
+electron/
+scripts/prepare-env.js
+README_APP_BUILD_LOCAL.md

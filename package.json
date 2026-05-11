@@ -1,0 +1,102 @@
+{
+  "name": "k-chat",
+  "version": "1.0.0",
+  "description": "KakaoTalk-style K-pop idol chat app",
+  "author": {
+    "name": "K-Chat Team",
+    "email": "noreply@k-chat.local"
+  },
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "desktop": "electron .",
+    "build:prepare-env": "node scripts/prepare-env.js",
+    "build:icons:win": "node scripts/build-win-icon.js",
+    "build:icons:linux": "bash -lc 'mkdir -p build/icons/linux && for s in 16 24 32 48 64 128 256 512; do convert \"build/icons/icon.png\" -resize ${s}x${s} \"build/icons/linux/${s}x${s}.png\"; done'",
+    "prebuild:win": "npm run build:prepare-env && npm run build:icons:win",
+    "prebuild:win:dir": "npm run build:prepare-env && npm run build:icons:win",
+    "prebuild:win:portable": "npm run build:prepare-env && npm run build:icons:win",
+    "prebuild:linux": "npm run build:prepare-env && npm run build:icons:linux",
+    "prebuild:linux:dir": "npm run build:prepare-env && npm run build:icons:linux",
+    "build:win": "electron-builder --win nsis --publish never",
+    "build:win:portable": "electron-builder --win portable --publish never",
+    "build:win:dir": "electron-builder --win --dir --publish never",
+    "build:linux": "electron-builder --linux AppImage deb --publish never",
+    "build:linux:dir": "electron-builder --linux --dir --publish never",
+    "check-env": "node scripts/check-env.js",
+    "test:models": "node scripts/model-smoke-test.js",
+    "start:source:linux": "bash scripts/run-linux.sh",
+    "install:source-launcher:linux": "bash scripts/install-linux-launcher.sh",
+    "start:linux": "bash scripts/run-linux.sh",
+    "start:windows": "scripts\\run-windows.bat",
+    "install:linux-launcher": "bash scripts/install-linux-launcher.sh"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "multer": "^2.1.1",
+    "openai": "^6.33.0"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "sharp": "^0.34.5",
+    "to-ico": "^1.1.5"
+  },
+  "build": {
+    "appId": "com.kchat.desktop",
+    "productName": "K-Chat",
+    "icon": "build/icons/icon.png",
+    "asar": true,
+    "asarUnpack": [
+      "characters/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "server.js",
+      "package.json",
+      "public/**/*",
+      "characters/**/*",
+      "data/**/*",
+      "templates/**/*",
+      ".env",
+      ".env.example",
+      "electron/**/*"
+    ],
+    "win": {
+      "icon": "build/icons/icon.ico",
+      "signAndEditExecutable": true,
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icons/icon.ico",
+      "uninstallerIcon": "build/icons/icon.ico",
+      "installerHeaderIcon": "build/icons/icon.ico",
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false,
+      "deleteAppDataOnUninstall": false,
+      "differentialPackage": false
+    },
+    "linux": {
+      "icon": "build/icons/linux",
+      "maintainer": "K-Chat Team <noreply@k-chat.local>",
+      "category": "Utility",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}
+
